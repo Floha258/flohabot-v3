@@ -1,0 +1,4 @@
+# Ignore TS built files
+release
+node_modules
+.env
