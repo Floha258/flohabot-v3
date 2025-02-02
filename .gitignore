@@ -1,4 +1,7 @@
 # Ignore TS built files
 release
 node_modules
+.idea
 .env
+.twitch_token.json
+bot.db

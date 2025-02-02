@@ -7,6 +7,6 @@ export interface DiscordCommand {
 }
 
 export interface CommandObject {
-    name: string,
-    command: DiscordCommand
+    name: string;
+    command: DiscordCommand;
 }

@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "type": "module",
     "description": "",
-    "exports": "release/index.js",
+    "exports": "./release/index.js",
     "scripts": {
         "build": "tsc",
         "lint": "eslint .",
@@ -13,12 +13,14 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@twurple/auth": "^7.2.1",
+        "@twurple/easy-bot": "^7.2.1",
         "better-sqlite3": "^11.8.1",
         "body-parser": "^1.20.3",
+        "discord-api-types": "^0.37.119",
         "discord.js": "^14.17.3",
         "dotenv": "^16.4.7",
-        "express": "^4.21.2",
-        "fs": "^0.0.1-security"
+        "express": "^4.21.2"
     },
     "devDependencies": {
         "@eslint/js": "^9.19.0",

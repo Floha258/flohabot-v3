@@ -6,11 +6,30 @@ import eslintPluginPrettierRecommened from 'eslint-config-prettier';
 /** @type {import('eslint').Linter.Config[]} */
 export default [
     {
-        files: ['**/*.{js,mjs,cjs,ts}'],
-        ignores: ['node_modules'],
+        languageOptions: {
+            globals: globals.browser,
+            parserOptions: {
+                projectService: true,
+                tsconfigRootDir: import.meta.dirname
+            }
+        }
     },
-    { languageOptions: { globals: globals.browser } },
     pluginJs.configs.recommended,
     eslintPluginPrettierRecommened,
-    ...tseslint.configs.recommended,
+    ...tseslint.configs.recommendedTypeChecked,
+    {
+        rules: {
+            '@typescript-eslint/no-misused-promises': 'off',
+            '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+            '@typescript-eslint/no-unsafe-assignment': 'off'
+        }
+    },
+    // Do not lint ts built files and the eslint config
+    {
+        ignores: ['release', 'eslint.config.js']
+    },
+    {
+        files: ['**/*.{js,mjs,cjs,ts}'],
+        ignores: ['node_modules']
+    }
 ];

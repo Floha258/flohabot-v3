@@ -9,7 +9,7 @@ const token = process.env.DISCORD_TOKEN || '';
 const rest = new REST().setToken(token);
 
 // and deploy your commands!
-(async () => {
+await (async () => {
     try {
         console.log(
             `Started refreshing ${commandsList.length} application (/) commands.`,
