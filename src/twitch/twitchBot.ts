@@ -2,6 +2,7 @@ import { RefreshingAuthProvider } from '@twurple/auth';
 import { Bot } from '@twurple/easy-bot';
 import { readFileSync, writeFileSync } from 'fs';
 import { db } from '../index.js';
+import { handleTwitchQuote } from './handleTwitchQuote.js';
 
 interface TwitchTokenFormat {
     access_token: string;
@@ -17,6 +18,8 @@ const channels: string[] = process.env.TWITCH_CHANNELS?.split(',') || [];
 const twitchToken: TwitchTokenFormat = JSON.parse(
     readFileSync('./.twitch_token.json', 'utf-8')
 );
+
+
 
 export async function startTwitchBot() {
     const auth = new RefreshingAuthProvider({ clientId, clientSecret: secret });
@@ -68,32 +71,37 @@ export async function startTwitchBot() {
         );
     });
 
-    bot.onMessage(
-        // eslint-disable-next-line @typescript-eslint/unbound-method
-        async ({ text: message, getUser, reply }) => {
-            // const user = await getUser();
+    bot.onMessage(async (messageEvent) => {
+        const reply = async (message: string) =>
+            await messageEvent.reply(message);
 
-            const [command, ...args] = message.trim().split(' ');
+        const [command, ...args] = messageEvent.text.trim().split(' ');
 
-            // not a command, nothing to do
-            if (!command.startsWith('!')) {
+        // not a command, nothing to do
+        if (!command.startsWith('!')) {
+            return;
+        }
+
+        const commandName = command.substring(1);
+
+        switch (commandName) {
+            // All quotes handling commands
+            case 'quote': {
+                return await handleTwitchQuote(args, reply, messageEvent, bot);
+            }
+            // Default command handling
+            default: {
+                const output = db
+                    .prepare(
+                        'SELECT `response` FROM `commands` WHERE `name` = ? AND `enabled` = 1'
+                    )
+                    .get(commandName) as { response: string } | undefined;
+                if (!output || !output.response) return;
+                await reply(output.response);
                 return;
             }
-
-            const commandName = command.substring(1);
-
-            switch (commandName) {
-                // Default command handling
-                default: {
-                    const output = db
-                        .prepare(
-                            'SELECT `response` FROM `commands` WHERE `name` = ? AND `enabled` = 1'
-                        )
-                        .get(commandName) as { response: string } | undefined;
-                    if (!output || !output.response) return;
-                    await reply(output.response);
-                }
-            }
         }
-    );
+    });
 }
+
+
