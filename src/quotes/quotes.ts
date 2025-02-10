@@ -91,7 +91,8 @@ export function getQuoteById(id: number): Quote | undefined {
             id: quote.id,
             quote: quote.quote_text,
             date: quote.creation_date,
-            alias: quote.alias
+            alias:
+                quote.alias || quote.alias !== 'NONE' ? quote.alias : undefined,
         };
     } catch (error) {
         console.log(error);
@@ -169,5 +170,23 @@ export function aliasQuote(alias: string, quoteId: number): Quote | undefined {
     } catch (error) {
         console.error(error);
         throw error;
+    }
+}
+
+export function getLatestQuote(): Quote | undefined {
+    try {
+        const quote = db
+            .prepare('SELECT * from `quotes` ORDER BY id DESC LIMIT 1')
+            .get() as DbQuote;
+        return {
+            alias:
+                quote.alias || quote.alias !== 'NONE' ? quote.alias : undefined,
+            date: quote.creation_date,
+            id: quote.id,
+            quote: quote.quote_text
+        };
+    } catch (error) {
+        console.log(error);
+        return;
     }
 }

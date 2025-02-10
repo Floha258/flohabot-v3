@@ -4,7 +4,7 @@ import {
     IntentsBitField,
     Collection,
     Events,
-    ChatInputCommandInteraction,
+    ChatInputCommandInteraction
 } from 'discord.js';
 import { commandsList } from './commands/_commands.js';
 import { DiscordCommand } from '../../types.js';
@@ -25,7 +25,8 @@ intents.add(
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.MessageContent
 );
 
 export async function startDiscordBot(): Promise<ClientWithCommands> {
@@ -49,7 +50,7 @@ export async function startDiscordBot(): Promise<ClientWithCommands> {
         const interaction = itraction as ChatInputCommandInteraction;
 
         const command = (interaction.client as ClientWithCommands).commands.get(
-            interaction.commandName,
+            interaction.commandName
         );
         if (!command) {
             console.error(`Could not find command ${interaction.commandName}`);
@@ -67,6 +68,6 @@ export async function startDiscordBot(): Promise<ClientWithCommands> {
             }
         }
     });
-    
+
     return client;
 }

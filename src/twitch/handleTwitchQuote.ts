@@ -4,7 +4,7 @@ import {
     addQuote,
     aliasQuote,
     deleteQuote,
-    editQuote,
+    editQuote, getLatestQuote,
     getQuoteByAlias,
     getQuoteById,
     getRandomQuote,
@@ -105,6 +105,13 @@ export async function handleTwitchQuote(
                 return await replyWithError(reply);
             }
             return;
+        }
+        case 'latest': {
+            const quote = getLatestQuote();
+            if (!quote) {
+                return await replyWithError(reply);
+            }
+            return await replyWithQuote(quote, reply);
         }
         // either requesting quote by id or by alias
         default: {

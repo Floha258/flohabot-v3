@@ -12,6 +12,7 @@ import {
     addQuote,
     deleteQuote,
     editQuote,
+    getLatestQuote,
     getQuoteByAlias,
     getQuoteById,
     getRandomQuote,
@@ -299,7 +300,7 @@ export const discordQuoteHandler = async (
                             allowedMentions: { repliedUser: false }
                         });
                     }
-                    await reaction.users.remove(interaction.user.id)
+                    await reaction.users.remove(interaction.user.id);
                 });
 
                 leftCollector.on('collect', async (reaction) => {
@@ -313,13 +314,28 @@ export const discordQuoteHandler = async (
                             ],
                             allowedMentions: { repliedUser: false }
                         });
-                        await reaction.users.remove(interaction.user.id)
+                        await reaction.users.remove(interaction.user.id);
                     }
                 });
                 return;
             }
             await interaction.editReply({
                 embeds: [buildQuoteEmbed(searchResult)],
+                allowedMentions: { repliedUser: false }
+            });
+            return;
+        }
+        case 'latest': {
+            const quote = getLatestQuote();
+            if (!quote) {
+                await interaction.editReply({
+                    embeds: [buildErrorEmbed()],
+                    allowedMentions: { repliedUser: false }
+                });
+                return;
+            }
+            await interaction.editReply({
+                embeds: [buildQuoteEmbed(quote)],
                 allowedMentions: { repliedUser: false }
             });
             return;

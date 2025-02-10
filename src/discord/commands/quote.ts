@@ -77,6 +77,11 @@ const quote: CommandObject = {
                             .setMinLength(1)
                             .setRequired(true)
                     )
+            )
+            .addSubcommand((subCommand) =>
+                subCommand
+                    .setName('latest')
+                    .setDescription('gets the latest quote from the db')
             ),
         execute: discordQuoteHandler
     }
