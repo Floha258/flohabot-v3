@@ -15,6 +15,7 @@
     "dependencies": {
         "@twurple/auth": "^7.2.1",
         "@twurple/easy-bot": "^7.2.1",
+        "archipelago.js": "^2.0.4",
         "better-sqlite3": "^11.8.1",
         "body-parser": "^1.20.3",
         "discord-api-types": "^0.37.119",

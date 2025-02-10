@@ -146,7 +146,7 @@ export function searchQuote(searchString: string): Quote | Quote[] | undefined {
                 return {
                     id: filteredQuote.id,
                     quote: filteredQuote.quote_text,
-                    date: filteredQuote.quote_text,
+                    date: filteredQuote.creation_date,
                     alias: filteredQuote.alias
                 };
             });
