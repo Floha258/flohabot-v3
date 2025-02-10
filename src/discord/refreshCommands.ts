@@ -1,6 +1,8 @@
-// Construct and prepare an instance of the REST module
-import commandsList from './commands/_commands.js';
+import { config } from 'dotenv';
+import { commandsList } from './commands/_commands.js';
 import { REST, Routes } from 'discord.js';
+
+config()
 
 const guildId = process.env.DISCORD_GUILD_ID || '';
 const clientId = process.env.DISCORD_CLIENT_ID || '';

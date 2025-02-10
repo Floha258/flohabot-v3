@@ -1,4 +1,6 @@
-import { db } from '../index.js';
+import Database from 'better-sqlite3';
+
+const db = new Database(process.env.dbName || 'bot.db');
 
 export interface Quote {
     quote: string;
@@ -159,23 +161,11 @@ export function searchQuote(searchString: string): Quote | Quote[] | undefined {
 
 export function aliasQuote(alias: string, quoteId: number): Quote | undefined {
     try {
-        const quote = db
-            .prepare('UPDATE `quotes` SET `alias` = ? WHERE `id` = ?')
-            .run(alias, quoteId) as
-            | {
-                  id: number;
-                  quote_text: string;
-                  creation_date: string;
-                  alias: string;
-              }
-            | undefined;
-        if (!quote) return;
-        return {
-            id: quote.id,
-            quote: quote.quote_text,
-            date: quote.creation_date,
-            alias: quote.alias
-        };
+        db.prepare('UPDATE `quotes` SET `alias` = ? WHERE `id` = ?').run(
+            alias,
+            quoteId
+        );
+        return getQuoteByAlias(alias);
     } catch (error) {
         console.error(error);
         throw error;

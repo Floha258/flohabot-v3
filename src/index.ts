@@ -1,15 +1,15 @@
 import Express from 'express';
-import Database from 'better-sqlite3';
 import { readFileSync } from 'fs';
 import { startDiscordBot } from './discord/discordBot.js';
 import { startTwitchBot } from './twitch/twitchBot.js';
+import Database from 'better-sqlite3';
 
 const PORT = process.env.port || '3258';
 const app = Express();
 
 const setupScript = readFileSync('./dbSetup.sql', 'utf-8');
 
-export const db = new Database(process.env.dbName || 'bot.db');
+const db = new Database(process.env.dbName || 'bot.db');
 
 db.exec(setupScript);
 

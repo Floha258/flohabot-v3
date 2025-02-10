@@ -1,6 +1,5 @@
 import type { MessageEvent } from '@twurple/easy-bot';
 import { Bot } from '@twurple/easy-bot';
-import type { Quote } from '../quotes/quotes.js';
 import {
     addQuote,
     aliasQuote,
@@ -11,13 +10,14 @@ import {
     getRandomQuote,
     searchQuote
 } from '../quotes/quotes.js';
+import { isMod, replyWithError, replyWithQuote } from './twitchBot.js';
 
 export async function handleTwitchQuote(
     args: string[],
     reply: (message: string) => Promise<void>,
     messageEvent: MessageEvent,
     bot: Bot
-) {
+): Promise<void> {
     switch (args[0]) {
         // no args provided return random quote
         case undefined: {
@@ -126,29 +126,4 @@ export async function handleTwitchQuote(
             return await replyWithQuote(quote, reply);
         }
     }
-}
-
-async function replyWithQuote(
-    quote: Quote,
-    reply: (text: string) => Promise<void>
-) {
-    await reply(
-        `#${quote?.id}: ${quote?.quote} ${quote?.date}${
-            !(quote?.alias === 'NONE') ? `. Also known as ${quote.alias}` : ''
-        } `
-    );
-}
-
-async function replyWithError(reply: (text: string) => Promise<void>) {
-    await reply(
-        "An error occured. Please try again. If it still doesn't work, something is" +
-            'probably on fire. #blameFloha'
-    );
-}
-
-async function isMod(bot: Bot, messageEvent: MessageEvent) {
-    const mods = await bot.getMods(messageEvent.broadcasterName);
-    return (
-        mods.filter((mod) => mod.userName === messageEvent.userName).length > 0
-    );
 }

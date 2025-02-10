@@ -1,5 +1,5 @@
 import ping from './ping.js';
+import quote from './quote.js';
 import { CommandObject } from '../../../types.js';
 
-const commandsList: CommandObject[] = [ping];
-export default commandsList;
+export const commandsList: CommandObject[] = [ping, quote];

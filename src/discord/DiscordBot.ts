@@ -6,7 +6,7 @@ import {
     Events,
     ChatInputCommandInteraction,
 } from 'discord.js';
-import commandsList from './commands/_commands.js';
+import { commandsList } from './commands/_commands.js';
 import { DiscordCommand } from '../../types.js';
 
 import 'dotenv/config.js';
