@@ -1,5 +1,5 @@
 import { RefreshingAuthProvider } from '@twurple/auth';
-import { Bot, MessageEvent } from '@twurple/easy-bot';
+import { ChatUser, ChatClient } from '@twurple/chat';
 import { readFileSync, writeFileSync } from 'fs';
 import { handleTwitchQuote } from './handleTwitchQuote.js';
 import {
@@ -57,31 +57,32 @@ export async function startTwitchBot() {
         ['chat']
     );
 
-    const bot = new Bot({ authProvider: auth, channels });
+    // const bot = new Bot({ authProvider: auth, channels });
+    const client = new ChatClient({ authProvider: auth, channels });
 
-    bot.onConnect(() => {
+    client.onConnect(() => {
         console.log(
             `Succesfully joined Twitch channels ${channels.join(', ')}`
         );
     });
 
-    bot.onSub(async ({ broadcasterName: channel, userName }) => {
-        await bot.say(channel, `Thank you for subscribing ${userName} <3`);
+    client.onSub(async (channel, user) => {
+        await client.say(channel, `Thank you for subscribing ${user} <3`);
     });
 
-    bot.onResub(async ({ broadcasterName: channel, userName, months }) => {
-        await bot.say(
+    client.onResub(async (channel, user, subInfo) => {
+        await client.say(
             channel,
-            `Thank you for subscribing for ${months} months ${userName} <3`
+            `Thank you for subscribing for ${subInfo.months} months ${user} <3`
         );
     });
 
-    bot.onMessage(async (messageEvent) => {
-        const reply = async (message: string) =>
-            await messageEvent.reply(message);
+    client.onMessage(async (channel, user, text, message) => {
+        const reply = async (reply: string) => {
+            await client.say(channel, reply, { replyTo: message });
+        };
 
-        const [command, ...args] = messageEvent.text.trim().split(' ');
-
+        const [command, ...args] = text.trim().split(' ');
         // not a command, nothing to do
         if (!command.startsWith('!')) {
             return;
@@ -92,10 +93,10 @@ export async function startTwitchBot() {
         switch (commandName) {
             // All quotes handling commands
             case 'quote': {
-                return await handleTwitchQuote(args, reply, messageEvent, bot);
+                return await handleTwitchQuote(args, reply, message);
             }
             case 'addcmd': {
-                if (!(await isMod(bot, messageEvent))) {
+                if (!isMod(message.userInfo)) {
                     return await reply(
                         'You do not have the permissions to perform this action'
                     );
@@ -118,7 +119,7 @@ export async function startTwitchBot() {
                 }
             }
             case 'setcmd': {
-                if (!(await isMod(bot, messageEvent))) {
+                if (!isMod(message.userInfo)) {
                     return await reply(
                         'You do not have the permissions to perform this action'
                     );
@@ -143,7 +144,7 @@ export async function startTwitchBot() {
                 }
             }
             case 'delcmd': {
-                if (!(await isMod(bot, messageEvent))) {
+                if (!isMod(message.userInfo)) {
                     return await reply(
                         'You do not have the permissions to perform this action'
                     );
@@ -190,13 +191,12 @@ export async function startTwitchBot() {
             }
         }
     });
+
+    client.connect();
 }
 
-export async function isMod(bot: Bot, messageEvent: MessageEvent) {
-    const mods = await bot.getMods(messageEvent.broadcasterName);
-    return (
-        mods.filter((mod) => mod.userName === messageEvent.userName).length > 0
-    );
+export function isMod(user: ChatUser) {
+    return user.isMod || user.isBroadcaster;
 }
 
 export async function replyWithError(reply: (text: string) => Promise<void>) {
@@ -212,7 +212,13 @@ export async function replyWithQuote(
 ) {
     await reply(
         `#${quote.id}: ${quote.quote} ${quote.date !== 'unknown' ? quote.date : ''}${
-            !(quote?.alias === 'NONE' || quote.alias === '' || quote.alias === 'unknown') ? `. Also known as ${quote.alias}` : ''
+            !(
+                quote?.alias === 'NONE' ||
+                quote.alias === '' ||
+                quote.alias === 'unknown'
+            )
+                ? `. Also known as ${quote.alias}`
+                : ''
         } `
     );
 }

@@ -1,22 +1,21 @@
-import type { MessageEvent } from '@twurple/easy-bot';
-import { Bot } from '@twurple/easy-bot';
 import {
     addQuote,
     aliasQuote,
     deleteQuote,
-    editQuote, getLatestQuote,
+    editQuote,
+    getLatestQuote,
     getQuoteByAlias,
     getQuoteById,
     getRandomQuote,
     searchQuote
 } from '../quotes/quotes.js';
 import { isMod, replyWithError, replyWithQuote } from './twitchBot.js';
+import { ChatMessage } from '@twurple/chat';
 
 export async function handleTwitchQuote(
     args: string[],
     reply: (message: string) => Promise<void>,
-    messageEvent: MessageEvent,
-    bot: Bot
+    message: ChatMessage
 ): Promise<void> {
     switch (args[0]) {
         // no args provided return random quote
@@ -42,7 +41,7 @@ export async function handleTwitchQuote(
                     return await replyWithQuote(quotes, reply);
                 }
                 const quoteIds = quotes.map((quote) => `'${quote.id}`);
-                return await messageEvent.reply(
+                return await reply(
                     `Found multiple quotes, try one of these: ${quoteIds.join(', ')}`
                 );
             } catch (error) {
@@ -57,7 +56,7 @@ export async function handleTwitchQuote(
             return await reply(`Succesfully added quote #${quote?.id}`);
         }
         case 'delete': {
-            if (!(await isMod(bot, messageEvent)))
+            if (!isMod(message.userInfo))
                 return await reply(
                     'You do not have the permissions to perform this action'
                 );
@@ -71,7 +70,7 @@ export async function handleTwitchQuote(
             }
         }
         case 'edit': {
-            if (!(await isMod(bot, messageEvent))) {
+            if (!isMod(message.userInfo)) {
                 return await reply(
                     'You do not have the permissions to perform this action'
                 );
@@ -86,7 +85,7 @@ export async function handleTwitchQuote(
             return await reply(`Succesfully edited quote #${quote.id}`);
         }
         case 'alias': {
-            if (!(await isMod(bot, messageEvent)))
+            if (!isMod(message.userInfo))
                 return await reply(
                     'You do not have the permissions to perform this action'
                 );
