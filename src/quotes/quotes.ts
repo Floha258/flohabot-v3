@@ -92,7 +92,7 @@ export function getQuoteById(id: number): Quote | undefined {
             quote: quote.quote_text,
             date: quote.creation_date,
             alias:
-                quote.alias || quote.alias !== 'NONE' ? quote.alias : undefined,
+                quote.alias || quote.alias !== 'NONE' ? quote.alias : undefined
         };
     } catch (error) {
         console.log(error);
