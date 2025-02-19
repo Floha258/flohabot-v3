@@ -4,7 +4,8 @@ import {
     IntentsBitField,
     Collection,
     Events,
-    ChatInputCommandInteraction
+    ChatInputCommandInteraction,
+    TextChannel
 } from 'discord.js';
 import { commandsList } from './commands/_commands.js';
 import { DiscordCommand } from '../../types.js';
@@ -29,8 +30,10 @@ intents.add(
     GatewayIntentBits.MessageContent
 );
 
+let client: ClientWithCommands;
+
 export async function startDiscordBot(): Promise<ClientWithCommands> {
-    const client = new Client({ intents: intents }) as ClientWithCommands;
+    client = new Client({ intents: intents }) as ClientWithCommands;
 
     client.once(Events.ClientReady, (client) => {
         console.log(`Client ready and logged in as ${client.user.tag}`);
@@ -70,4 +73,18 @@ export async function startDiscordBot(): Promise<ClientWithCommands> {
     });
 
     return client;
+}
+
+export async function sendDiscordMessage(
+    channel: TextChannel,
+    message: string
+) {
+    if (!client) {
+        throw new Error('Discord Client not ready');
+    }
+
+    if (!channel || !channel.isTextBased()) {
+        throw new Error('Channel does not exist or is not a text channel');
+    }
+    await channel.send(message);
 }
